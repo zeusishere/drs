@@ -12,12 +12,12 @@ const userSchema = new mongoose.Schema({
     hash: String,
     salt: String,
   },
-  projects: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Project",
-    },
-  ],
+  role: {
+    student: { type: Boolean, default: false },
+    ta: { type: Boolean, default: false },
+    teacher: { type: Boolean, default: false },
+    admin: { type: Boolean, default: false },
+  },
 });
-const Users = mongoose.model("Users", userSchema);
+const Users = mongoose.model("User", userSchema);
 module.exports = Users;

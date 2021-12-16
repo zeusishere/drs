@@ -11,16 +11,24 @@ passport.use(
     },
     async function (req, email, password, done) {
       try {
+        let { role } = req.body;
+
         let userFromDB = await User.findOne({ email });
-        if (!userFromDB) {
+        console.log(role, userFromDB.role[role]);
+        if (!userFromDB || !userFromDB.role[role]) {
           return done(null, false);
         }
-        let isPasswordValid = validPassword(passport, user.hash, user.salt);
+        let isPasswordValid = validPassword(
+          password,
+          userFromDB.password.hash,
+          userFromDB.password.salt
+        );
         if (isPasswordValid) {
-          return done(null, user);
+          return done(null, userFromDB);
         }
         return done(null, false);
       } catch (err) {
+        console.log(err);
         done(err);
       }
     }
@@ -41,3 +49,42 @@ passport.deserializeUser((userId, done) => {
       return done(err);
     });
 });
+//  middlewares to check authentication
+passport.checkAuthentication = function (req, res, next) {
+  if (req.isAuthenticated()) {
+    // console.log("useer is authenticated")
+    return next();
+  }
+  console.log("authentication FAILED ");
+  return res.redirect("/user/signin");
+};
+passport.setAuthenticatedUser = (req, res, next) => {
+  if (req.isAuthenticated()) {
+    res.locals.user = req.user;
+  }
+  next();
+};
+passport.authorizedStudent = (req, res, next) => {
+  if (req.isAuthenticated() && res.locals.user.role.student) {
+    return next();
+  }
+  console.log("you are not registered as a student");
+  return res.end("you are not autherized to view this page");
+};
+passport.authorizedTa = (req, res, next) => {
+  console.log("res.locals.user.role.student  ", res.locals.user.role.ta);
+
+  if (req.isAuthenticated() && res.locals.user.role.ta) {
+    return next();
+  }
+  console.log("you are not registered as a ta");
+  return res.end("you are not autherized to view this page");
+};
+passport.authorizedTeacher = (req, res, next) => {
+  if (req.isAuthenticated() && res.locals.user.role.teacher) {
+    return next();
+  }
+  console.log("you are not registered as a teacher");
+  return res.end("you are not autherized to view this page");
+};
+module.exports = passport;

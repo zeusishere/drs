@@ -1,0 +1,23 @@
+<div class="col-xl-10 offset-md-1">
+  <h3 class="my-5">Raise Doubt</h3>
+  <div class="bg-secondary px-3">
+    <form action="/student/raise-doubt" method="POST">
+      <div class="mb-3 my-1">
+        <label for="title" class="form-label">Title :</label>
+        <input type="text" class="form-control" id="title" name="title" />
+      </div>
+      <div class="mb-3 my-1">
+        <label for="description" class="form-label">Description:</label>
+        <textarea
+          class="form-control"
+          id="description"
+          rows="3"
+          name="description"
+        ></textarea>
+      </div>
+      <div class="text-end">
+        <button type="submit" class="btn btn-primary px-4">Ask Doubt</button>
+      </div>
+    </form>
+  </div>
+</div>

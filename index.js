@@ -1,13 +1,16 @@
 const express = require("express");
 const db = require("./configs/mongoose");
 const app = express();
+require("dotenv").config();
 let port = 8000;
-let passport = require("passport");
-let passportLocal = require("./configs/passport-local");
+const passport = require("passport");
+const passportLocal = require("./configs/passport-local");
+const session = require("express-session");
+const MongoStore = require("connect-mongo");
 let expresslayouts = require("express-ejs-layouts");
 // setting up middlewares
 
-port = process.env.PORT;
+port = parseInt(process.env.PORT);
 if (port == null || port == "") {
   port = 8000;
 }
@@ -19,10 +22,26 @@ app.set("views", "./views");
 app.use(expresslayouts);
 app.set("layout extractScripts", true);
 app.set("layout extractStyles", true);
+// session middleware Setup
+console.log("FSDfsffffffffffffffffffffff", typeof process.env.PORT);
+const sessionStore = MongoStore.create({
+  mongoUrl: process.env.DB_CONN,
+  // client: db,
+  // dbName: "node_auth",
+});
+app.use(
+  session({
+    secret: "secret",
+    resave: false,
+    saveUninitialized: false,
+    store: sessionStore,
+    cookie: { maxAge: 1000 * 60 * 60 * 24 },
+  })
+);
 // passport middleware
 app.use(passport.initialize());
 app.use(passport.session());
-
+app.use(passport.setAuthenticatedUser);
 app.use("/", require("./routes/index"));
 
 app.listen(port, (err) => {
