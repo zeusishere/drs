@@ -1,6 +1,25 @@
 const express = require("express");
 const db = require("./configs/mongoose");
 const app = express();
+const http = require("http");
+const socketPort = 3000;
+const server = http.createServer();
+const io = require("socket.io")(server, {
+  cors: {
+    origin: "http://localhost:8000",
+    methods: ["GET", "POST"],
+  },
+});
+// socket.io code
+io.on("connection", (socket) => {
+  console.log("New websocket connection");
+  socket.on("disconnect", () => {
+    console.log("New websocket disconnected");
+  });
+});
+server.listen(socketPort);
+global.io = io;
+// socket .io code end
 require("dotenv").config();
 let port = 8000;
 const passport = require("passport");
@@ -16,12 +35,14 @@ if (port == null || port == "") {
 }
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(require("cors")());
 app.use(express.static("./public"));
 app.set("view engine", "ejs");
 app.set("views", "./views");
 app.use(expresslayouts);
 app.set("layout extractScripts", true);
 app.set("layout extractStyles", true);
+// setting socket.io code here
 // session middleware Setup
 console.log("FSDfsffffffffffffffffffffff", typeof process.env.PORT);
 const sessionStore = MongoStore.create({

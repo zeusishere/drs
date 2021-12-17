@@ -14,7 +14,7 @@ passport.use(
         let { role } = req.body;
 
         let userFromDB = await User.findOne({ email });
-        console.log(role, userFromDB.role[role]);
+        // console.log(role, userFromDB.role[role]);
         if (!userFromDB || !userFromDB.role[role]) {
           return done(null, false);
         }
@@ -72,7 +72,7 @@ passport.authorizedStudent = (req, res, next) => {
   return res.end("you are not autherized to view this page");
 };
 passport.authorizedTa = (req, res, next) => {
-  console.log("res.locals.user.role.student  ", res.locals.user.role.ta);
+  console.log("res.locals.user.role.ta ", res.locals.user.role.ta);
 
   if (req.isAuthenticated() && res.locals.user.role.ta) {
     return next();

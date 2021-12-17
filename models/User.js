@@ -18,6 +18,21 @@ const userSchema = new mongoose.Schema({
     teacher: { type: Boolean, default: false },
     admin: { type: Boolean, default: false },
   },
+  ta: {
+    doubtsAccepted: [
+      {
+        doubt: { type: mongoose.SchemaTypes.ObjectId, ref: "Doubt" },
+        doubtAcceptalTime: { type: Date },
+      },
+    ],
+    doubtsResolved: [
+      {
+        doubt: { type: mongoose.SchemaTypes.ObjectId, ref: "Doubt" },
+        avgActivityTime: { type: Number },
+      },
+    ],
+    doubtsEscalated: [{ type: mongoose.SchemaTypes.ObjectId, ref: "Doubt" }],
+  },
 });
 const Users = mongoose.model("User", userSchema);
 module.exports = Users;

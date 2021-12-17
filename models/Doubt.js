@@ -11,6 +11,12 @@ const doubtSchema = new mongoose.Schema(
       enum: ["resolved", "active", "pending"],
       default: "pending",
     },
+    hasDoubtBeenEscalated: { type: Boolean, default: false },
+    // ?
+    tasWhoHaveEscalatedTheDoubt: [
+      { type: mongoose.SchemaTypes.ObjectId, ref: "User" },
+    ],
+    activeTa: { type: String },
     timeOfResolution: { type: Date },
     comments: [
       {
