@@ -4,29 +4,9 @@ const app = express();
 const flash = require("connect-flash");
 const cookieParser = require("cookie-parser");
 const customMware = require("./configs/middleware");
-// socket.io code
-// const http = require("http");
-// const socketPort = 3000;
-// const server = http.createServer();
-// const io = require("socket.io")(server, {
-//   cors: {
-//     origin: "http://localhost:8000",
-//     methods: ["GET", "POST"],
-//   },
-// });
 
-//  // to be setup later as an added feature to show realtime notifications to students and tas .
-// io.on("connection", (socket) => {
-//   console.log("New websocket connection");
-//   socket.on("disconnect", () => {
-//     console.log("New websocket disconnected");
-//   });
-// });
-// server.listen(socketPort);
-// global.io = io;
-// socket .io code end
 require("dotenv").config();
-let port = 8000;
+let port;
 const passport = require("passport");
 const passportLocal = require("./configs/passport-local");
 const session = require("express-session");
@@ -49,9 +29,7 @@ app.set("views", "./views");
 app.use(expresslayouts);
 app.set("layout extractScripts", true);
 app.set("layout extractStyles", true);
-// setting socket.io code here
 // session middleware Setup
-console.log("FSDfsffffffffffffffffffffff", typeof process.env.PORT);
 const sessionStore = MongoStore.create({
   mongoUrl: process.env.DB_CONN,
 });
