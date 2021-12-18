@@ -1,0 +1,72 @@
+<div class="container col-12">
+  <h4 class="my-5">Dashboard</h4>
+  <!-- div with doubts  collection stats -->
+  <div class="row justify-content-between py-5">
+    <div
+      class="
+        col-2
+        bg-grey-container
+        border border-2 border-secondary
+        text-center
+      "
+    >
+      <p class="text-center fs-4 mb-1 py-1"><%= totalDoubts %></p>
+      doubts asked
+    </div>
+    <div
+      class="
+        col-2
+        bg-grey-container
+        border border-2 border-secondary
+        text-center
+      "
+    >
+      <p class="text-center fs-4 mb-1"><%= resolvedDoubts %></p>
+      Doubts resolved
+    </div>
+    <div
+      class="
+        col-2
+        bg-grey-container
+        border border-2 border-secondary
+        text-center
+      "
+    >
+      <p class="text-center fs-4 mb-1"><%= escalatedDoubts %></p>
+      Doubts escalated
+    </div>
+    <div
+      class="
+        col-2
+        bg-grey-container
+        border border-2 border-secondary
+        text-center
+      "
+    >
+      <p class="text-center fs-4 mb-1">
+        <%= avgDoubtResolutionTime.toFixed(2) %> mins
+      </p>
+      Avg. doubt resolution time
+    </div>
+  </div>
+  <div class="row justify-content-between bg-grey-container pb-5">
+    <div class="col-10 offset-1 fs-5 px-0 my-4">TA Reports</div>
+    <% for(let ta of taList) { %>
+    <!-- doubts stats corresponding to each ta -->
+    <div
+      class="
+        col-10
+        bg-color-grey-light
+        offset-1
+        py-3
+        border border-2 border-secondary
+      "
+    >
+      <%= ta.userName %> <br />
+      Doubts Accepted: <%= ta.totalDoubtsAccepted %> | Doubts Resolved: <%=
+      ta.resolvedDoubts %> | Doubts Escalated:<%= ta.escalatedDoubts %> | Avg.
+      Doubt Activity Time:<%= ta.avgActivityTime.toFixed(2) %>min
+    </div>
+    <% } %>
+  </div>
+</div>

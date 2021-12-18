@@ -8,8 +8,7 @@ function registerListenersToAddCommentBtns() {
 function makeAReqToAddCommentToDatabase(event) {
   let commentText = event.target.previousElementSibling.value;
   let doubtId = event.target.getAttribute("data-doubtId");
-  console.log(doubtId);
-  console.log(commentText);
+
   let data = { commentText, doubtId };
   //   let xmlReq = new XMLHttpRequest();
   fetch("/student/add-comment", {
@@ -27,17 +26,37 @@ function makeAReqToAddCommentToDatabase(event) {
         let commentContainer = document.getElementById(
           `comments-container-${doubtId}`
         );
-        console.log(commentContainer);
-        addCommentToDom(commentContainer, data.data);
+        addCommentToDom(commentContainer, data.data, doubtId);
+        showNotificationOnScreen("success", "successfully added comment");
+        // clear the comment input box
+        event.target.previousElementSibling.value = "";
+      } else {
+        showNotificationOnScreen(
+          "error",
+          "There was some error while trying to add comment."
+        );
       }
     });
 }
-function addCommentToDom(commentContainer, data) {
-  console.log(data);
-  let newComment = `<div class="px-3 py-1 mb-2">
+function addCommentToDom(commentContainer, data, doubtId) {
+  let newComment = `<div class="px-3 py-1 mb-2 bg-color-grey-light
+  border border-2 border-secondary ">
     ${data.user} :${data.comment}
   </div>`;
-  console.log(newComment);
   commentContainer.innerHTML = newComment + commentContainer.innerHTML;
+  // update total comments for Post
+  let commentsCount = document.getElementById(`comments-count-${doubtId}`);
+  commentsCount.innerHTML = parseInt(commentsCount.innerHTML) + 1 + " comments";
+}
+
+function showNotificationOnScreen(notificationType, message) {
+  new Noty({
+    theme: "relax",
+    text: `${message}`,
+    type: `${notificationType}`,
+    layout: "topRight",
+    timeout: 1000,
+    progressBar: true,
+  }).show();
 }
 registerListenersToAddCommentBtns();

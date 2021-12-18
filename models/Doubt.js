@@ -12,11 +12,12 @@ const doubtSchema = new mongoose.Schema(
       default: "pending",
     },
     hasDoubtBeenEscalated: { type: Boolean, default: false },
-    // ?
-    tasWhoHaveEscalatedTheDoubt: [
-      { type: mongoose.SchemaTypes.ObjectId, ref: "User" },
-    ],
+    //  removed field
+    // tasWhoHaveEscalatedTheDoubt: [
+    //   { type: mongoose.SchemaTypes.ObjectId, ref: "User" },
+    // ],
     activeTa: { type: String },
+    timeOfDoubtAcceptal: { type: Date },
     timeOfResolution: { type: Date },
     comments: [
       {

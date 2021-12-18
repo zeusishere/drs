@@ -1,26 +1,60 @@
-<div class="col-xl-10 offset-md-1">
+<div class="col-xl-10 offset-md-1 mt-5">
   <h4>Home</h4>
-  <h6 class="text-end">total-doubts</h6>
+  <div class="text-end px-3">
+    <a class="btn btn-sm btn-primary" href="/student/raise-doubt"
+      >Raise a doubt</a
+    >
+  </div>
+  <br />
+  <h6 class="text-end px-3"><%=doubts.length%> doubts</h6>
   <div class="container" id="doubt-container">
+    <!-- display all doubts -->
     <% for (let doubt of doubts) { %>
-    <div data-doubtId="<%= doubt.id %>" class="bg-secondary my-4">
+    <div
+      data-doubtId="<%= doubt.id %>"
+      class="bg-grey-container my-4 px-2 py-3 border border-2 border-secondary"
+    >
       <h5 class="doubt-title">
-        How to do ruby on rails in ajax ?<%= doubt.title %>
+        <%= doubt.title %> <% if(doubt.status == "resolved") {%>
+        <span class="float-end badge bg-success">Resolved</span>
+        <%}%>
       </h5>
-      <p class="doubt-description ps-2 fs-5">
-        How to do ruby on rails in ajax ? <%= doubt.description %>
-      </p>
+      <p class="doubt-description ps-2 fs-5"><%= doubt.description %></p>
       <p class="askedBy text-end">
-        Asked By :<%= doubt.Author %>fsfs on <% doubt.createdAt %> sdfdf
+        <% let doubtCreationDate= new Date(doubt.createdAt); const months =
+        ["January", "February", "March", "April", "May", "June", "July",
+        "August", "September", "October", "November", "December"]; %> Asked By :
+        <%= doubt.author.userName %> on <%= months[doubtCreationDate.getMonth()]
+        %> <%=doubtCreationDate.getDay()%> , <%=doubtCreationDate.getHours()
+        %>:<%= doubtCreationDate.getMinutes() %>
       </p>
+      <%if(doubt.answer !="" ) { %>
+      <p>
+        <span class="fw-bold">Answer : </span> <%=doubt.answer %><br />
+        Answered by : <%= doubt.answeredBy.userName%>
+      </p>
+      <%}%>
       <hr />
       <br />
-      <p class="total-comments text-start px-1">
+      <p
+        class="total-comments text-start px-1"
+        id="comments-count-<%=doubt._id%>"
+      >
         <%= doubt.comments.length %> comments
       </p>
       <div id="comments-container-<%=doubt._id%>">
+        <!-- diplay all comments for a particular doubt -->
         <%for(let comment of doubt.comments.reverse()) { %>
-        <div id="comment-<%=comment._id%>" class="px-3 py-1 mb-2">
+        <div
+          id="comment-<%=comment._id%>"
+          class="
+            px-3
+            py-1
+            mb-2
+            bg-color-grey-light
+            border border-2 border-secondary
+          "
+        >
           <%= comment.user.userName %> : <%= comment.commentText %>
         </div>
         <%}%>
@@ -40,12 +74,6 @@
           Add Comment
         </button>
       </div>
-      <!-- <div class="mb-3 my-1 col-auto">
-        <input type="text" class="form-control" id="comment" name="comment" />
-      </div>
-      <div class="col-auto">
-        <button class="btn btn-primary">Comment</button>
-      </div> -->
     </div>
     <% }%>
   </div>

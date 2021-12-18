@@ -1,7 +1,8 @@
 <div class="container">
   <h4 class="my-5">Solve Doubts</h4>
   <div class="row">
-    <div class="col-6 bg-light">
+    <!-- doubt details div -->
+    <div class="col-6 border border-2 border-secondary bg-grey-container pb-5">
       <h5><%=doubt.title%></h5>
       <p><%=doubt.description%></p>
       <% let doubtCreationDate= new Date(doubt.createdAt); const months =
@@ -25,8 +26,15 @@
         <%}%>
       </div>
     </div>
-
-    <div class="col-5 bg-light offset-sm-1">
+    <!-- div with options to add / escalate doubts -->
+    <div
+      class="
+        col-5
+        offset-sm-1
+        bg-color-grey-light
+        border border-2 border-secondary
+      "
+    >
       <div>
         <form action="/ta/answer-doubt/?id=<%=doubt.id%>" method="POST">
           <div class="mb-3 my-1">

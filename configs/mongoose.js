@@ -1,3 +1,4 @@
+// to setup and export connection to mongoDB
 const mongoose = require("mongoose");
 mongoose.connect(
   "mongodb+srv://shubham:2424554@cluster0.w9vzk.mongodb.net/node_auth?retryWrites=true&w=majority"

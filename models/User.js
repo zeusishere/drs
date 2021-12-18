@@ -12,6 +12,7 @@ const userSchema = new mongoose.Schema({
     hash: String,
     salt: String,
   },
+  currentlyLoggedInAs: { type: String, enum: ["student", "ta", "teacher"] },
   role: {
     student: { type: Boolean, default: false },
     ta: { type: Boolean, default: false },

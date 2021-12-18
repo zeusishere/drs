@@ -3,24 +3,25 @@ const router = express.Router();
 const passport = require("../configs/passport-local");
 const Strategy = require("passport-local/lib");
 const userController = require("../controllers/user");
-router.get("/", (req, res) => {
-  return res.render("./v1.ejs");
-});
+router.get("/", userController.redirectUserToSpecificHomePage);
+//  User sign in and and sign up
 router.get("/sign-in", (req, res) => {
+  if (req.isAuthenticated()) return res.redirect("/");
   res.render("signIn.ejs");
 });
 router.get("/sign-up", (req, res) => {
+  // if user is already logged in
+  if (req.isAuthenticated()) return res.redirect("/");
   res.render("signUp.ejs");
 });
+router.get("/log-out", userController.logout);
+
 router.post(
   "/sign-in",
   passport.authenticate("local", {
     failureRedirect: "/sign-in",
-    successRedirect: "/sign-up",
   }),
-  (req, res) => {
-    res.send(req.body);
-  }
+  userController.createSession
 );
 
 router.post("/sign-up", userController.createUser);

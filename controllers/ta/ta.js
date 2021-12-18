@@ -1,19 +1,20 @@
 const Doubt = require("../../models/Doubt");
 const Comment = require("../../models/comment");
 const User = require("../../models/User");
-
-let checkIfDoubtIdExistsInDoubtsArr = (doubtsAccepted, doubtId) => {
-  return doubtsAccepted.some((element) => {
-    return element.doubt == doubtId;
-  });
-};
+const taUtilFns = require("../../utilties/ta-utils");
+//  helper fn to check if the doubt id is present in array
+let checkIfDoubtIdExistsInDoubtsArr = taUtilFns.checkIfDoubtIdExistsInDoubtsArr;
 module.exports.renderTaHome = async (req, res) => {
   try {
-    // console.log("global    ", global.io);
-
     let doubts = await Doubt.find({ status: "pending" }).sort({ createdAt: 1 });
     res.render("./ta/taHome.ejs", { doubts });
-  } catch (err) {}
+  } catch (err) {
+    console.log(err);
+    req.flash(
+      "error",
+      "There was an Internal server error . Please reload the page . "
+    );
+  }
 };
 module.exports.renderDoubt = async (req, res) => {
   try {
@@ -25,21 +26,35 @@ module.exports.renderDoubt = async (req, res) => {
         path: "comments",
         populate: [{ path: "user", select: "userName" }],
       });
-    // if doubt is already being taken by another ta
+    // to check if doubt is already resolved
+    if (doubt.status === "resolved") {
+      req.flash(
+        "error",
+        "sorry the doubt has already been answered by another Ta .Please select another doubt"
+      );
+      return res.redirect("back");
+    }
+    // if doubt has already been taken by another ta , rediect to ta home
     if (
       doubt.status == "active" &&
       doubt.activeTa != null &&
       doubt.activeTa != req.user.id
     ) {
+      req.flash(
+        "error",
+        "sorry the doubt has already been taken by another Ta .Pleas select another doubt"
+      );
       return res.redirect("back");
     }
+    // continue down if doubt is pending
     doubt.status = "active";
     doubt.activeTa = req.user.id;
+    doubt.timeOfDoubtAcceptal = new Date();
     doubt.save();
-    console.log("Adasd");
+
     let activeUser = await User.findById(req.user._id);
     console.log(activeUser);
-    // check if doubtId already exists in doubts accepted arr
+    // check if doubtId already exists in doubts accepted array of current
 
     if (
       !checkIfDoubtIdExistsInDoubtsArr(activeUser.ta.doubtsAccepted, doubtId)
@@ -50,6 +65,7 @@ module.exports.renderDoubt = async (req, res) => {
       });
     }
     await activeUser.save();
+
     return res.render("./ta/viewDoubt.ejs", { doubt: doubt });
   } catch (err) {
     console.log(err);
@@ -60,35 +76,35 @@ module.exports.escalateDoubt = async (req, res) => {
     console.log(req.query);
     let doubtId = req.query.id;
     let doubt = await Doubt.findById(doubtId);
-
     doubt.status = "pending";
     doubt.activeTa = "null";
+    doubt.timeOfDoubtAcceptal = null;
     doubt.hasDoubtBeenEscalated = true;
     console.log(doubt);
-    // ?
-    // if (!doubt.tasWhoHaveEscalatedTheDoubt.includes(req.user._id)) {
-    //   doubt.tasWhoHaveEscalatedTheDoubt.push(req.user.id);
-    // }
-    //
     let activeUser = await User.findById(req.user._id);
+    // the root of error is here
     if (
-      !checkIfDoubtIdExistsInDoubtsArr(activeUser.ta.doubtsEscalated, doubtId)
+      !activeUser.ta.doubtsEscalated.some((element) => {
+        return doubtId == element;
+      })
     ) {
+      console.log("inside escalated doubts");
       activeUser.ta.doubtsEscalated.push(doubtId);
     }
     await activeUser.save();
     await doubt.save();
+    req.flash("success", "You have escalated the doubt");
     return res.redirect("/ta");
   } catch (err) {
     console.log(err);
     return res.redirect("/ta");
   }
 };
-// just answer doubt
 module.exports.answerDoubt = async (req, res) => {
   try {
     console.log(req.query, req.body);
     let doubtId = req.query.id;
+    console.log(doubtId);
     let doubt = await Doubt.findById(doubtId);
     doubt.status = "resolved";
     doubt.activeTa = "null";
@@ -96,15 +112,25 @@ module.exports.answerDoubt = async (req, res) => {
     doubt.answer = req.body.answer;
     doubt.timeOfResolution = new Date();
     doubt.save();
-
+    //  need to save the resolved doubt with ta model (inside ta.doubtsResolved)
+    // just a routine check to prevent same doubt being added twice due to reload etc
     let activeUser = await User.findById(req.user._id);
     if (
       !checkIfDoubtIdExistsInDoubtsArr(activeUser.ta.doubtsResolved, doubtId)
     ) {
-      // const diffTime = Math.abs( - );
-      // activeUser.ta.doubtsResolved.push({ doubtId: doubtId , avgActivityTime:1 });
+      console.log("inside if answer");
+      // calculates activity time of doubt in milliseconds
+      const diffTime = Math.abs(
+        doubt.timeOfResolution - doubt.timeOfDoubtAcceptal
+      );
+      // save avgActivityTime along with doubt
+      activeUser.ta.doubtsResolved.push({
+        doubt: doubtId,
+        avgActivityTime: diffTime,
+      });
     }
     activeUser.save();
+    req.flash("success", "You have successfully answered the doubt");
     return res.redirect("/ta");
   } catch (err) {
     console.log(err);

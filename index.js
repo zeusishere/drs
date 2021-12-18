@@ -1,24 +1,29 @@
 const express = require("express");
 const db = require("./configs/mongoose");
 const app = express();
-const http = require("http");
-const socketPort = 3000;
-const server = http.createServer();
-const io = require("socket.io")(server, {
-  cors: {
-    origin: "http://localhost:8000",
-    methods: ["GET", "POST"],
-  },
-});
+const flash = require("connect-flash");
+const cookieParser = require("cookie-parser");
+const customMware = require("./configs/middleware");
 // socket.io code
-io.on("connection", (socket) => {
-  console.log("New websocket connection");
-  socket.on("disconnect", () => {
-    console.log("New websocket disconnected");
-  });
-});
-server.listen(socketPort);
-global.io = io;
+// const http = require("http");
+// const socketPort = 3000;
+// const server = http.createServer();
+// const io = require("socket.io")(server, {
+//   cors: {
+//     origin: "http://localhost:8000",
+//     methods: ["GET", "POST"],
+//   },
+// });
+
+//  // to be setup later as an added feature to show realtime notifications to students and tas .
+// io.on("connection", (socket) => {
+//   console.log("New websocket connection");
+//   socket.on("disconnect", () => {
+//     console.log("New websocket disconnected");
+//   });
+// });
+// server.listen(socketPort);
+// global.io = io;
 // socket .io code end
 require("dotenv").config();
 let port = 8000;
@@ -35,8 +40,10 @@ if (port == null || port == "") {
 }
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(cookieParser());
 app.use(require("cors")());
 app.use(express.static("./public"));
+
 app.set("view engine", "ejs");
 app.set("views", "./views");
 app.use(expresslayouts);
@@ -47,8 +54,6 @@ app.set("layout extractStyles", true);
 console.log("FSDfsffffffffffffffffffffff", typeof process.env.PORT);
 const sessionStore = MongoStore.create({
   mongoUrl: process.env.DB_CONN,
-  // client: db,
-  // dbName: "node_auth",
 });
 app.use(
   session({
@@ -63,7 +68,10 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(passport.setAuthenticatedUser);
+app.use(flash());
+app.use(customMware.setFlash);
 app.use("/", require("./routes/index"));
+// flash
 
 app.listen(port, (err) => {
   if (err) return console.log("error in setting up server ", err);
