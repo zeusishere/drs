@@ -18,7 +18,6 @@ module.exports.renderTaHome = async (req, res) => {
 };
 module.exports.renderDoubt = async (req, res) => {
   try {
-    console.log(req.query);
     let doubtId = req.query.id;
     let doubt = await Doubt.findById(doubtId)
       .populate("author", "userName")
@@ -53,7 +52,6 @@ module.exports.renderDoubt = async (req, res) => {
     doubt.save();
 
     let activeUser = await User.findById(req.user._id);
-    console.log(activeUser);
     // check if doubtId already exists in doubts accepted array of current
 
     if (
@@ -67,20 +65,16 @@ module.exports.renderDoubt = async (req, res) => {
     await activeUser.save();
 
     return res.render("./ta/viewDoubt.ejs", { doubt: doubt });
-  } catch (err) {
-    console.log(err);
-  }
+  } catch (err) {}
 };
 module.exports.escalateDoubt = async (req, res) => {
   try {
-    console.log(req.query);
     let doubtId = req.query.id;
     let doubt = await Doubt.findById(doubtId);
     doubt.status = "pending";
     doubt.activeTa = "null";
     doubt.timeOfDoubtAcceptal = null;
     doubt.hasDoubtBeenEscalated = true;
-    console.log(doubt);
     let activeUser = await User.findById(req.user._id);
     // the root of error is here
     if (
@@ -88,7 +82,6 @@ module.exports.escalateDoubt = async (req, res) => {
         return doubtId == element;
       })
     ) {
-      console.log("inside escalated doubts");
       activeUser.ta.doubtsEscalated.push(doubtId);
     }
     await activeUser.save();
@@ -96,15 +89,12 @@ module.exports.escalateDoubt = async (req, res) => {
     req.flash("success", "You have escalated the doubt");
     return res.redirect("/ta");
   } catch (err) {
-    console.log(err);
     return res.redirect("/ta");
   }
 };
 module.exports.answerDoubt = async (req, res) => {
   try {
-    console.log(req.query, req.body);
     let doubtId = req.query.id;
-    console.log(doubtId);
     let doubt = await Doubt.findById(doubtId);
     doubt.status = "resolved";
     doubt.activeTa = "null";
@@ -118,7 +108,6 @@ module.exports.answerDoubt = async (req, res) => {
     if (
       !checkIfDoubtIdExistsInDoubtsArr(activeUser.ta.doubtsResolved, doubtId)
     ) {
-      console.log("inside if answer");
       // calculates activity time of doubt in milliseconds
       const diffTime = Math.abs(
         doubt.timeOfResolution - doubt.timeOfDoubtAcceptal

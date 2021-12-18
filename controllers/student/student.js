@@ -48,7 +48,6 @@ module.exports.createACommentAndAddItToDoubt = async (req, res) => {
       doubt: doubtId,
       user: req.user.id,
     });
-    console.log("new comment ", newComment._id);
     // associatedDoubtWithNewComment refers to the doubt on which the comment will be added
     let associatedDoubtWithNewComment = await Doubt.findById(doubtId);
     associatedDoubtWithNewComment.comments.push(newComment._id);

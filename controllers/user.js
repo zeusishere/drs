@@ -4,7 +4,6 @@ let student = "student",
   teacher = "teacher",
   teachingAssistant = "ta";
 module.exports.createSession = async (req, res) => {
-  console.log("req.body", req.body);
   // when user logs in
   let role = req.body.role;
   req.flash("success", "logged in Successfully");
@@ -38,7 +37,6 @@ module.exports.redirectUserToSpecificHomePage = async (req, res) => {
 module.exports.createUser = async (req, res) => {
   try {
     let { email, userName, password, role } = req.body;
-    console.log(req.body);
     let user = await User.findOne({ email });
     let roleOption = { [role]: true };
     if (user) {
